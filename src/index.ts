@@ -1,12 +1,28 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 
+import rateLimit from 'express-rate-limit';
+
 dotenv.config();
 
 import stringRoutes from './routes/stringRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.set('trust proxy', 1); // Trust first proxy for rate limiting
+
+// Rate Limiting Middleware
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 15,
+  message: {
+    status: 'error',
+    message: 'Too many requests, please try again later.',
+  },
+});
+
+app.use(limiter);
 
 app.use(express.json());
 
