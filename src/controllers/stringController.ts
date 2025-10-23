@@ -22,32 +22,32 @@ export const createStringAnalysis = (req: Request, res: Response) => {
   }
 
   const analysisResult = analyzeString(inputString);
-  const { sha256Hash } = analysisResult;
+  const { sha256_hash } = analysisResult;
 
-  if (stringStore.has(sha256Hash)) {
+  if (stringStore.has(sha256_hash)) {
     return res.status(409).json({
       error: 'Conflict: String already exists in the system',
     });
   }
 
   const newEntry: StringResponse = {
-    id: sha256Hash,
+    id: sha256_hash,
     value: inputString,
     properties: analysisResult,
     created_at: new Date().toISOString(),
   };
 
-  stringStore.set(sha256Hash, newEntry);
+  stringStore.set(sha256_hash, newEntry);
   res.status(201).json(newEntry);
 };
 
 export const getString = (req: Request, res: Response) => {
   const stringValue: string = req.params.string_value;
 
-  const { sha256Hash } = analyzeString(stringValue);
+  const { sha256_hash } = analyzeString(stringValue);
 
   // Direct lookup by hash (much faster)
-  const entry = stringStore.get(sha256Hash);
+  const entry = stringStore.get(sha256_hash);
 
   if (!entry) {
     return res
@@ -80,7 +80,7 @@ export const getAllStrings = (req: Request, res: Response) => {
     }
     const isPalindromeBool = is_palindrome === 'true';
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.isPalindrome === isPalindromeBool
+      entry => entry.properties.is_palindrome === isPalindromeBool
     );
     filtersApplied.is_palindrome = isPalindromeBool;
   }
@@ -137,7 +137,7 @@ export const getAllStrings = (req: Request, res: Response) => {
       });
     }
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.wordCount === wordCountNum
+      entry => entry.properties.word_count === wordCountNum
     );
     filtersApplied.word_count = wordCountNum;
   }
@@ -153,7 +153,7 @@ export const getAllStrings = (req: Request, res: Response) => {
       });
     }
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.charFrequencyMap[character] !== undefined
+      entry => entry.properties.character_frequency_map[character] !== undefined
     );
     filtersApplied.contains_character = character;
   }
@@ -163,8 +163,7 @@ export const getAllStrings = (req: Request, res: Response) => {
   res.status(200).json({
     data: filteredEntries,
     count: filteredEntries.length,
-    filters_applied:
-      Object.keys(filtersApplied).length > 0 ? filtersApplied : null,
+    filters_applied: filtersApplied,
   });
 };
 
@@ -208,7 +207,7 @@ export const filterByNaturalLanguage = (req: Request, res: Response) => {
 
   if (parsedFilters.is_palindrome !== undefined) {
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.isPalindrome === parsedFilters.is_palindrome
+      entry => entry.properties.is_palindrome === parsedFilters.is_palindrome
     );
   }
 
@@ -226,14 +225,14 @@ export const filterByNaturalLanguage = (req: Request, res: Response) => {
 
   if (parsedFilters.word_count !== undefined) {
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.wordCount === parsedFilters.word_count
+      entry => entry.properties.word_count === parsedFilters.word_count
     );
   }
 
   if (parsedFilters.contains_character !== undefined) {
     const character = parsedFilters.contains_character.toLowerCase();
     filteredEntries = filteredEntries.filter(
-      entry => entry.properties.charFrequencyMap[character] !== undefined
+      entry => entry.properties.character_frequency_map[character] !== undefined
     );
   }
 
@@ -253,10 +252,10 @@ export const deleteString = (req: Request, res: Response) => {
   const stringValue: string = req.params.string_value;
 
   // Calculate the hash of the string to find it in the store
-  const { sha256Hash } = analyzeString(stringValue);
+  const { sha256_hash } = analyzeString(stringValue);
 
   // Check if the entry exists
-  const entry = stringStore.get(sha256Hash);
+  const entry = stringStore.get(sha256_hash);
 
   if (!entry) {
     return res
@@ -264,7 +263,7 @@ export const deleteString = (req: Request, res: Response) => {
       .json({ error: 'String does not exist in the system' });
   }
 
-  stringStore.delete(sha256Hash);
+  stringStore.delete(sha256_hash);
 
   console.log('deleted');
 

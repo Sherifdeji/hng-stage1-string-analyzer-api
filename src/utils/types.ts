@@ -1,11 +1,11 @@
 export interface StringProperties {
   length: number;
-  isPalindrome: boolean;
-  uniqueCharacters: number;
-  wordCount: number;
-  sha256Hash: string;
-  charFrequencyMap: Record<string, number>;
-  createdAt?: string;
+  is_palindrome: boolean;
+  unique_characters: number;
+  word_count: number;
+  sha256_hash: string;
+  character_frequency_map: Record<string, number>;
+  created_at?: string;
 }
 
 export interface StringResponse {

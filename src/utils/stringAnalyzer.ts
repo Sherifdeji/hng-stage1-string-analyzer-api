@@ -5,32 +5,34 @@ export function analyzeString(input: string): StringProperties {
   //length
   const length = input.length;
 
-  // isPalindrome
+  // is_palindrome
   const cleanString = input.toLowerCase().replace(/\s/g, '');
-  const isPalindrome = cleanString === cleanString.split('').reverse().join('');
+  const is_palindrome =
+    cleanString === cleanString.split('').reverse().join('');
 
-  // uniqueCharacters
-  const uniqueCharacters = new Set(input.toLowerCase().replace(/\s/g, '')).size;
+  // unique_characters
+  const unique_characters = new Set(input.toLowerCase().replace(/\s/g, ''))
+    .size;
 
-  // wordCount
-  const wordCount = input.trim() === '' ? 0 : input.trim().split(/\s+/).length;
+  // word_count
+  const word_count = input.trim() === '' ? 0 : input.trim().split(/\s+/).length;
 
-  // sha256Hash
-  const sha256Hash = crypto.createHash('sha256').update(input).digest('hex');
+  // sha256_hash
+  const sha256_hash = crypto.createHash('sha256').update(input).digest('hex');
 
-  // charFrequencyMap
-  const charFrequencyMap: Record<string, number> = {};
+  // character_frequency_map
+  const character_frequency_map: Record<string, number> = {};
   for (const char of input) {
     if (char === ' ') continue;
-    charFrequencyMap[char] = (charFrequencyMap[char] || 0) + 1;
+    character_frequency_map[char] = (character_frequency_map[char] || 0) + 1;
   }
 
   return {
     length,
-    isPalindrome,
-    uniqueCharacters,
-    wordCount,
-    sha256Hash,
-    charFrequencyMap,
+    is_palindrome,
+    unique_characters,
+    word_count,
+    sha256_hash,
+    character_frequency_map,
   };
 }
