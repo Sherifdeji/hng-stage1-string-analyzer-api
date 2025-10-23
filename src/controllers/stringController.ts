@@ -5,21 +5,22 @@ import { stringStore } from '../utils/storage';
 import { parseNaturalLanguageQuery } from '../utils/naturalLanguageParser';
 
 export const createStringAnalysis = (req: Request, res: Response) => {
-  const inputString: string = req.body.value;
+  const { value } = req.body;
 
-  if (!inputString) {
+  if (!value) {
     return res
       .status(400)
       .json({ error: 'Invalid request body or missing "value" field' });
   }
 
-  // Used regex to validate that inputString is indeed a string
-  if (/\d/.test(inputString)) {
+  if (typeof value !== 'string') {
     return res.status(422).json({
       error:
         "Unprocessable Entity: Invalid data type for 'value' (must be string)",
     });
   }
+
+  const inputString: string = value;
 
   const analysisResult = analyzeString(inputString);
   const { sha256_hash } = analysisResult;
@@ -144,16 +145,19 @@ export const getAllStrings = (req: Request, res: Response) => {
 
   // Validate and apply contains_character
   if (contains_character !== undefined) {
-    const character = (contains_character as string).toLowerCase();
+    const character = contains_character as string;
     // Validate that it's a single character
-    if (character.length !== 1 || !/^[a-z]$/.test(character)) {
+    if (character.length) {
       return res.status(400).json({
         error: 'Bad Request: Invalid query parameter values or types',
         details: 'contains_character must be a single lowercase letter (a-z)',
       });
     }
-    filteredEntries = filteredEntries.filter(
-      entry => entry.properties.character_frequency_map[character] !== undefined
+    // filteredEntries = filteredEntries.filter(
+    //   entry => entry.properties.character_frequency_map[character] !== undefined
+    // );
+    filteredEntries = filteredEntries.filter(entry =>
+      entry.value.includes(character)
     );
     filtersApplied.contains_character = character;
   }
@@ -267,5 +271,5 @@ export const deleteString = (req: Request, res: Response) => {
 
   console.log('deleted');
 
-  res.status(204).send();
+  res.status(204).end();
 };
